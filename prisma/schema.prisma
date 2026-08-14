@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+enum PromoCodeStatus {
+  ASSIGNED
+  EXPIRED
+}
+
+// One row per discount code we created via the Admin API — the source of truth for allocation.
+model PromoCode {
+  id                 String          @id @default(cuid())
+  code               String          @unique
+  discountNodeId     String          @unique
+  discountPercentage Float?
+  status             PromoCodeStatus @default(ASSIGNED)
+  createdAt          DateTime        @default(now())
+  issuance           Issuance?
+
+  @@index([status])
+}
+
+// Unique constraint on email is the idempotency guarantee: one issuance per submitter,
+// enforced at the DB level so a race between two concurrent requests can't double-allocate.
+model Issuance {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  promoCodeId String    @unique
+  promoCode   PromoCode @relation(fields: [promoCodeId], references: [id])
+  assignedAt  DateTime  @default(now())
+  resentAt    DateTime?
+  resendCount Int       @default(0)
+  emailSent   Boolean   @default(false)
+  emailSentAt DateTime?
+  codeUsedAt  DateTime?
+}
+
+// Per-shop promo configuration editable from the admin UI.
+model PromoSettings {
+  shop               String   @id
+  discountTitle      String
+  discountPercentage Float
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}

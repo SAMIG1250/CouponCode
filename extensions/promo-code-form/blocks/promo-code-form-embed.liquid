@@ -1,0 +1,146 @@
+{%- liquid
+  assign show_form = false
+  if request.page_type == 'page'
+    assign configured_handle = block.settings.page_handle | strip | downcase
+    if configured_handle == blank or page.handle == configured_handle
+      assign show_form = true
+    endif
+  endif
+-%}
+
+{%- if show_form -%}
+  <div class="promo-code-form-embed">
+    {%- render 'promo-code-form',
+      form_id: block.id,
+      api_base_url: block.settings.api_base_url,
+      page_title: block.settings.page_title,
+      page_subtitle: block.settings.page_subtitle,
+      show_page_header: block.settings.show_page_header,
+      title_font_size: block.settings.title_font_size,
+      subtitle_font_size: block.settings.subtitle_font_size,
+      title_alignment: block.settings.title_alignment,
+      discount_percentage: block.settings.discount_percentage,
+      offer_subheading: block.settings.offer_subheading,
+      eyebrow: block.settings.eyebrow,
+      community_banner: block.settings.community_banner,
+      accent_color: block.settings.accent_color,
+      shopify_attributes: block.shopify_attributes
+    -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Promo form page embed",
+  "target": "body",
+  "stylesheet": "promo-code-form.css",
+  "javascript": "promo-code-form.js",
+  "settings": [
+    {
+      "type": "text",
+      "id": "page_handle",
+      "label": "Page handle",
+      "default": "get-promo-code",
+      "info": "Must match your promo page URL handle, e.g. /pages/get-promo-code"
+    },
+    {
+      "type": "header",
+      "content": "Page heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_page_header",
+      "label": "Show page heading",
+      "default": true,
+      "info": "Displays the title above the promo card. Use this when your theme page title is hidden."
+    },
+    {
+      "type": "text",
+      "id": "page_title",
+      "label": "Heading",
+      "default": "Get Your Exclusive Promo Code"
+    },
+    {
+      "type": "text",
+      "id": "page_subtitle",
+      "label": "Subheading",
+      "default": "Unlock special discounts"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Heading size",
+      "min": 24,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "subtitle_font_size",
+      "label": "Subheading size",
+      "min": 14,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "Heading alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Offer details"
+    },
+    {
+      "type": "range",
+      "id": "discount_percentage",
+      "label": "Fallback discount percentage",
+      "info": "Used only until app settings load. The value saved in the app admin Settings page is shown on the storefront.",
+      "min": 1,
+      "max": 100,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Badge label",
+      "default": "Exclusive offer"
+    },
+    {
+      "type": "text",
+      "id": "offer_subheading",
+      "label": "Offer subheading",
+      "default": "on your next purchase"
+    },
+    {
+      "type": "text",
+      "id": "community_banner",
+      "label": "Community banner",
+      "default": "Join our community and unlock exclusive offers!"
+    },
+    {
+      "type": "text",
+      "id": "api_base_url",
+      "label": "App URL (optional)",
+      "info": "Leave blank to use the default app proxy (/apps/lemonvision-promo)."
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#c9a227"
+    }
+  ]
+}
+{% endschema %}

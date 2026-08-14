@@ -1,0 +1,27 @@
+{
+  "form": {
+    "page_title": "Get Your Exclusive Promo Code",
+    "page_subtitle": "Unlock special discounts",
+    "email_label": "Email address",
+    "email_placeholder": "you@example.com",
+    "submit_label": "Get my promo code",
+    "copy_code_label": "Copy & use code",
+    "code_label": "Your promo code",
+    "footnote": "One code per email. We'll send your discount straight to your inbox.",
+    "success_message": "Your promo code is ready. We also sent it to your email.",
+    "duplicate_message": "You already have a code — we've resent it to your email.",
+    "error_message": "Something went wrong. Please try again in a moment.",
+    "invalid_email_message": "Please enter a valid email address.",
+    "missing_app_url_message": "App URL is not configured in theme settings.",
+    "copied_message": "Code copied!",
+    "feature_1_title": "Valid on all products",
+    "feature_1_desc": "No minimum order",
+    "feature_2_title": "Limited time offer",
+    "feature_2_desc": "Valid for 7 days",
+    "feature_3_title": "One time use only",
+    "feature_3_desc": "Use it before it expires",
+    "community_banner": "Join our community and unlock exclusive offers!",
+    "offer_subheading": "on your next purchase",
+    "expiry_note": "Check your email for full terms and expiry details."
+  }
+}
