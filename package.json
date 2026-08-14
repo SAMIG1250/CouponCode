@@ -18,7 +18,8 @@
     "graphql-codegen": "graphql-codegen",
     "vite": "vite",
     "typecheck": "react-router typegen && tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "prisma generate"
   },
   "type": "module",
   "engines": {
@@ -30,6 +31,7 @@
     "@react-router/fs-routes": "^7.12.0",
     "@react-router/node": "^7.12.0",
     "@react-router/serve": "^7.12.0",
+    "@vercel/react-router": "^1.0.0",
     "@shopify/app-bridge-react": "^4.2.4",
     "@shopify/cli": "4.6.1",
     "@shopify/shopify-app-react-router": "^1.2.1",

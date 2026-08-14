@@ -96,7 +96,7 @@ describe("GET /api/promo settings", () => {
       request,
       params: {},
       context: {},
-    });
+    } as any);
 
     expect(response).toMatchObject({
       data: {
