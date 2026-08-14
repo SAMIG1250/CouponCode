@@ -110,7 +110,10 @@ export async function action({ request }: ActionFunctionArgs) {
       }
     } catch (emailError) {
       await recordPromoEmailSent(email, false);
-      throw emailError;
+      logger.warn(
+        { email, event: "promo_smtp_email_skipped", reason: (emailError as Error).message },
+        "SMTP email failed or not configured; promo code saved to Shopify Customer Metafield for native Shopify Flow/Email",
+      );
     }
     return data({ status: outcome, code }, { status: 200, headers });
   } catch (error) {

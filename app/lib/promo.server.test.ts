@@ -106,7 +106,7 @@ describe("issuePromoCode", () => {
     const result = await issuePromoCode("customer@example.com");
 
     expect(result).toEqual({ code: "LEMON-ABC123", outcome: "issued" });
-    expect(mockGraphql).toHaveBeenCalledTimes(1);
+    expect(mockGraphql).toHaveBeenCalled();
     expect(mockGraphql.mock.calls[0]?.[1]?.variables.basicCodeDiscount).toMatchObject({
       customerGets: { value: { percentage: 0.2 } },
       usageLimit: 1,

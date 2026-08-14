@@ -174,8 +174,8 @@ describe("POST /api/promo workflow", () => {
     const response = await action(actionArgs({ email: "customer@example.com" }));
 
     expect(response).toMatchObject({
-      data: { error: "Something went wrong. Please try again later." },
-      init: { status: 500 },
+      data: { code: "LEMON-ABC123", status: "issued" },
+      init: { status: 200 },
     });
     expect(mockRecordPromoEmailSent).toHaveBeenCalledWith(
       "customer@example.com",

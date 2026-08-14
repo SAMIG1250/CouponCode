@@ -42,6 +42,103 @@ const DEACTIVATE_DISCOUNT_MUTATION = `#graphql
   }
 `;
 
+const FIND_CUSTOMER_QUERY = `#graphql
+  query FindCustomerByEmail($query: String!) {
+    customers(first: 1, query: $query) {
+      nodes {
+        id
+      }
+    }
+  }
+`;
+
+const METAFIELDS_SET_MUTATION = `#graphql
+  mutation SetCustomerMetafield($metafields: [MetafieldsSetInput!]!) {
+    metafieldsSet(metafields: $metafields) {
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+const CREATE_CUSTOMER_MUTATION = `#graphql
+  mutation CreateCustomerWithPromo($input: CustomerInput!) {
+    customerCreate(input: $input) {
+      customer {
+        id
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+export async function syncPromoCodeToCustomerMetafield(
+  email: string,
+  code: string,
+  shop?: string,
+): Promise<void> {
+  try {
+    const shopDomain = resolveShopDomain(shop);
+    const { admin } = await retryOnTransientFailure(
+      () => unauthenticated.admin(shopDomain),
+      { label: "unauthenticated.admin" },
+    );
+
+    const findResponse = await admin.graphql(FIND_CUSTOMER_QUERY, {
+      variables: { query: `email:${email}` },
+    });
+    const findBody = await findResponse.json();
+    const customerId = findBody.data?.customers?.nodes?.[0]?.id;
+
+    if (customerId) {
+      await admin.graphql(METAFIELDS_SET_MUTATION, {
+        variables: {
+          metafields: [
+            {
+              ownerId: customerId,
+              namespace: "custom",
+              key: "promo_code",
+              value: code,
+              type: "single_line_text_field",
+            },
+          ],
+        },
+      });
+    } else {
+      await admin.graphql(CREATE_CUSTOMER_MUTATION, {
+        variables: {
+          input: {
+            email,
+            metafields: [
+              {
+                namespace: "custom",
+                key: "promo_code",
+                value: code,
+                type: "single_line_text_field",
+              },
+            ],
+          },
+        },
+      });
+    }
+
+    logger.info(
+      { email, code, event: "customer_metafield_synced" },
+      "synced promo code to Shopify customer metafield",
+    );
+  } catch (error) {
+    logger.warn(
+      { email, code, error: (error as Error).message, event: "customer_metafield_sync_failed" },
+      "failed to sync promo code to customer metafield",
+    );
+  }
+}
+
 export type IssuePromoCodeResult = {
   code: string;
   outcome: "issued" | "resent";
@@ -221,6 +318,8 @@ export async function issuePromoCode(
     }
     throw error;
   }
+
+  await syncPromoCodeToCustomerMetafield(normalizedEmail, code, shop);
 
   logger.info(
     {
